@@ -2,9 +2,17 @@ package com.msleads.msleads.repository;
 
 import com.msleads.msleads.model.User;
 import com.msleads.msleads.service.DatabaseConnectionService;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.mindrot.jbcrypt.BCrypt;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +23,7 @@ public class UserRepository {
     private static final String DELETE_USER = "DELETE FROM users WHERE id = ?";
     private static final String SELECT_USER_BY_ID = "SELECT * FROM users WHERE id = ?";
     private static final String SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = ?";
+    private static final String SECRET_KEY = "Hy5Jf7xX8dWbCLkX7qLm9kz2q3fMewLg3TQRwFDgNX4=";
 
     private final DatabaseConnectionService connectionService;
 
@@ -39,7 +48,13 @@ public class UserRepository {
                         user.setName(resultSet.getString("name"));
                         user.setEmail(resultSet.getString("email"));
                         user.setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime());
+
+
+                        // token
+                        String token = generateJwtToken(user);
+                        user.setToken(token);
                         return user;
+
                     } else {
                         return null;
                     }
@@ -147,14 +162,29 @@ public class UserRepository {
         }
     }
 
+    // jwt
+    private String generateJwtToken(User user) {
 
-//    // private
-//    private String generateRandomSalt() {
-//        return BCrypt.gensalt();
-//    }
-//
-//    private String generatePasswordHash(String password, String salt) {
-//        return BCrypt.hashpw(password, salt);
-//    }
-//
+        Instant now = Instant.now();
+        Instant expirationTime = now.plus(1, ChronoUnit.HOURS); // Token expires in 1 hour
+
+        return Jwts.builder()
+                .setSubject(user.getEmail())
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expirationTime))
+                .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    private boolean verifyJwtToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)))
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (JwtException e) {
+            return false;
+        }
+    }
 }
