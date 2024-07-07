@@ -2,8 +2,10 @@ package com.msleads.msleads.config;
 
 import com.msleads.msleads.model.Lead;
 import com.msleads.msleads.repository.LeadRepository;
+import com.msleads.msleads.repository.UserRepository;
 import com.msleads.msleads.service.DatabaseConnectionService;
 import com.msleads.msleads.service.LeadService;
+import com.msleads.msleads.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,15 +22,26 @@ public class AppConfig {
         return new LeadRepository(connectionService);
     }
 
+    @Bean
+    public UserRepository userRepository(DatabaseConnectionService connectionService) {
+        return new UserRepository(connectionService);
+    }
+
+
     // service
     @Bean
     public LeadService leadService(LeadRepository leadRepository) {
         return new LeadService(leadRepository);
     }
+    @Bean
+    public UserService userService(UserRepository userRepository) {
+        return new UserService(userRepository);
+    }
+
 
     //
     @Bean
-    public JerseyConfig jerseyConfig(LeadService leadService) {
-        return new JerseyConfig(leadService);
+    public JerseyConfig jerseyConfig(LeadService leadService, UserService userService) {
+        return new JerseyConfig(leadService, userService);
     }
 }
