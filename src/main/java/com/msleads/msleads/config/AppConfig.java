@@ -4,6 +4,7 @@ import com.msleads.msleads.model.Lead;
 import com.msleads.msleads.repository.LeadRepository;
 import com.msleads.msleads.repository.UserRepository;
 import com.msleads.msleads.service.DatabaseConnectionService;
+import com.msleads.msleads.service.JwtService;
 import com.msleads.msleads.service.LeadService;
 import com.msleads.msleads.service.UserService;
 import org.springframework.context.annotation.Bean;
@@ -23,8 +24,8 @@ public class AppConfig {
     }
 
     @Bean
-    public UserRepository userRepository(DatabaseConnectionService connectionService) {
-        return new UserRepository(connectionService);
+    public UserRepository userRepository(DatabaseConnectionService connectionService, JwtService jwtService) {
+        return new UserRepository(connectionService, jwtService);
     }
 
 
