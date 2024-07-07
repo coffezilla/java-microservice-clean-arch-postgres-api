@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:13
+    container_name: postgres-msleads
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
+    name: java-msleads
