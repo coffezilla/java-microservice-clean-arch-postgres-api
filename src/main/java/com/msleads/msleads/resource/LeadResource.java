@@ -1,5 +1,6 @@
 package com.msleads.msleads.resource;
 
+import com.msleads.msleads.config.Secured;
 import com.msleads.msleads.model.Lead;
 import com.msleads.msleads.service.LeadService;
 import jakarta.ws.rs.*;
@@ -23,6 +24,7 @@ public class LeadResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Secured
     public Response createLead(Lead lead) {
         lead.setCreatedAt(LocalDateTime.now());
         leadService.createLead(lead);
@@ -31,6 +33,7 @@ public class LeadResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Secured
     public Response getAllLeads() {
         List<Lead> leads = leadService.getAllLeads();
         return Response.ok(leads).build();
@@ -39,6 +42,7 @@ public class LeadResource {
     @DELETE
     @Path("/{leadId}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Secured
     public Response deleteLead(@PathParam("leadId") Long leadId) {
         leadService.deleteLead(leadId);
         Map<String, String> response = new HashMap<>();
@@ -50,6 +54,7 @@ public class LeadResource {
     @GET
     @Path("/{leadId}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Secured
     public Response getLeadById(@PathParam("leadId") Long leadId) {
         Lead lead = leadService.findLeadById(leadId);
         if (lead == null) {
@@ -62,6 +67,7 @@ public class LeadResource {
     @Path("/{leadId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Secured
     public Response updateLead(@PathParam("leadId") Long leadId, Lead updateLead) {
         // find lead
         Lead lead = leadService.findLeadById(leadId);

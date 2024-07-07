@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserRepository {
+
     private static final String SELECT_ALL_USERS = "SELECT id, name, email, password_hash, password_salt, created_at FROM users ORDER BY id";
     private static final String INSERT_USER = "INSERT INTO users (name, email, password_hash, password_salt, created_at) VALUES (?, ?, ?, ?, ?)";
     private static final String UPDATE_USER = "UPDATE users SET name = ? WHERE id = ?";

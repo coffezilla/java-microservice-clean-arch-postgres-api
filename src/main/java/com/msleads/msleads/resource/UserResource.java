@@ -1,12 +1,12 @@
 package com.msleads.msleads.resource;
 
+import com.msleads.msleads.config.Secured;
 import com.msleads.msleads.model.User;
 import com.msleads.msleads.service.UserService;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -39,6 +39,7 @@ public class UserResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Secured
     public Response getAllUsers() {
         List<User> users = userService.getAllUsers();
         return Response.ok(users).build();
@@ -56,6 +57,7 @@ public class UserResource {
     @DELETE
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Secured
     public Response deleteUser(@PathParam("userId") Long userId) {
         userService.deleteUser(userId);
         Map<String, String> response = new HashMap<>();
@@ -66,6 +68,7 @@ public class UserResource {
     @GET
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Secured
     public Response getUserById(@PathParam("userId") Long userId) {
         User user  = userService.findUserById(userId);
         if (user == null) {
@@ -78,6 +81,7 @@ public class UserResource {
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Secured
     public Response updateUser(@PathParam("userId") Long userId, User updatedUser) {
         User user = userService.findUserById(userId);
         if (user == null) {

@@ -13,9 +13,13 @@ import org.springframework.context.annotation.Configuration;
 @ApplicationPath("/api")
 public class JerseyConfig extends ResourceConfig {
 
-    public JerseyConfig(LeadService leadService, UserService userService) {
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public JerseyConfig(LeadService leadService, UserService userService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         register(new LeadResource(leadService));
         register(new UserResource(userService));
+        register(jwtAuthenticationFilter);
 
     }
 

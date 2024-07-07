@@ -1,6 +1,5 @@
 package com.msleads.msleads.config;
 
-import com.msleads.msleads.model.Lead;
 import com.msleads.msleads.repository.LeadRepository;
 import com.msleads.msleads.repository.UserRepository;
 import com.msleads.msleads.service.DatabaseConnectionService;
@@ -39,10 +38,20 @@ public class AppConfig {
         return new UserService(userRepository);
     }
 
-
-    //
     @Bean
-    public JerseyConfig jerseyConfig(LeadService leadService, UserService userService) {
-        return new JerseyConfig(leadService, userService);
+    public JwtService jwtService() {
+        return new JwtService();
+    }
+
+    // filter
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter();
+    }
+
+    // jersey config
+    @Bean
+    public JerseyConfig jerseyConfig(LeadService leadService, UserService userService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+        return new JerseyConfig(leadService, userService, jwtAuthenticationFilter);
     }
 }
