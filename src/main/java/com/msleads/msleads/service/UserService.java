@@ -12,12 +12,16 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    public User login(String email, String password) {
+        return userRepository.login(email, password);
+    }
+
     public List<User> getAllUsers() {
         return userRepository.getAllUsers();
     }
 
-    public User createUser(User user, String password) {
-        return userRepository.createUser(user, password);
+    public User createUser(User user) {
+        return userRepository.createUser(user);
     }
 
     public void deleteUser(Long userId) {

@@ -5,6 +5,8 @@ import com.msleads.msleads.service.UserService;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -20,6 +22,21 @@ public class UserResource {
         this.userService = userService;
     }
 
+    @POST
+    @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response login(@RequestBody Map<String, String> loginData) {
+        try {
+            String email = loginData.get("email");
+            String password = loginData.get("password");
+            User user = userService.login(email, password);
+            return Response.ok(user).build();
+        } catch(Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers() {
@@ -30,9 +47,9 @@ public class UserResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createUser(User user, @QueryParam("password") String password) {
+    public Response createUser(User user) {
         user.setCreatedAt(LocalDateTime.now());
-        userService.createUser(user, password);
+        userService.createUser(user);
         return Response.status(Response.Status.CREATED).entity(user).build();
     }
 

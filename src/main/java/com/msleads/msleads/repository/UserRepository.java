@@ -14,6 +14,7 @@ public class UserRepository {
     private static final String UPDATE_USER = "UPDATE users SET name = ? WHERE id = ?";
     private static final String DELETE_USER = "DELETE FROM users WHERE id = ?";
     private static final String SELECT_USER_BY_ID = "SELECT * FROM users WHERE id = ?";
+    private static final String SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = ?";
 
     private final DatabaseConnectionService connectionService;
 
@@ -22,13 +23,44 @@ public class UserRepository {
         this.connectionService = connectionService;
     }
 
-    public User createUser(User user, String password) {
+    public User login(String email, String password) {
+        try (Connection connection = connectionService.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SELECT_USER_BY_EMAIL)) {
+            statement.setString(1, email);
+            try(ResultSet resultSet = statement.executeQuery()) {
+                if(resultSet.next()) {
+
+                    String storedPasswordHash = resultSet.getString("password_hash");
+
+                    if (BCrypt.checkpw(password, storedPasswordHash)) {
+
+                        User user = new User();
+                        user.setId(resultSet.getLong("id"));
+                        user.setName(resultSet.getString("name"));
+                        user.setEmail(resultSet.getString("email"));
+                        user.setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime());
+                        return user;
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
+    public User createUser(User user) {
 
         // generate random salt
-        String salt = generateRandomSalt();
+        String salt = BCrypt.gensalt();
 
         // generate salt
-        String passwordHash = generatePasswordHash(password, salt);
+        String passwordRaw = user.getPassword();
+        String passwordHash = BCrypt.hashpw(passwordRaw, salt);
 
         // set generated salt and hash
         user.setPasswordHash(passwordHash);
@@ -36,7 +68,7 @@ public class UserRepository {
 
         try (Connection connection = connectionService.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_USER)) {
-            statement.setString(1, user.getName());
+            statement.setString(1, passwordRaw);
             statement.setString(2, user.getEmail());
             statement.setString(3, user.getPasswordHash());
             statement.setString(4, user.getPasswordSalt());
@@ -116,13 +148,13 @@ public class UserRepository {
     }
 
 
-    // private
-    private String generateRandomSalt() {
-        return BCrypt.gensalt();
-    }
-
-    private String generatePasswordHash(String password, String salt) {
-        return BCrypt.hashpw(password, salt);
-    }
-
+//    // private
+//    private String generateRandomSalt() {
+//        return BCrypt.gensalt();
+//    }
+//
+//    private String generatePasswordHash(String password, String salt) {
+//        return BCrypt.hashpw(password, salt);
+//    }
+//
 }
