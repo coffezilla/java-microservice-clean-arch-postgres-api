@@ -78,7 +78,7 @@ public class UserRepository {
 
         try (Connection connection = connectionService.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_USER)) {
-            statement.setString(1, passwordRaw);
+            statement.setString(1, user.getName());
             statement.setString(2, user.getEmail());
             statement.setString(3, user.getPasswordHash());
             statement.setString(4, user.getPasswordSalt());
